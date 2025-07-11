@@ -35,13 +35,17 @@ app.add_middleware(
 
 # API Configuration
 API_URL = "https://crop.kindwise.com/api/v1/identification"
-API_KEY = "u12lFbhGXOPacNJgi4pqK2scNsm34OryIiw99IIPJLKzjgntD5"
+API_KEY = os.environ.get("API_KEY", "u12lFbhGXOPacNJgi4pqK2scNsm34OryIiw99IIPJLKzjgntD5")
 
 # DeepSeek Configuration
-DEEPSEEK_CLIENT = OpenAI(
-    api_key="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",
-    base_url="https://openrouter.ai/api/v1"
-)
+try:
+    DEEPSEEK_CLIENT = OpenAI(
+        api_key=os.environ.get("DEEPSEEK_API_KEY", "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"),
+        base_url="https://openrouter.ai/api/v1"
+    )
+except Exception as e:
+    print(f"Warning: Failed to initialize OpenAI client: {e}")
+    DEEPSEEK_CLIENT = None
 
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = "uploads"
@@ -50,6 +54,10 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 async def get_deepseek_treatment(crops, diseases):
     """Get treatment recommendations from DeepSeek AI"""
     try:
+        # Check if DeepSeek client is available
+        if DEEPSEEK_CLIENT is None:
+            return "AI treatment recommendations are temporarily unavailable. Please consult with a local agricultural expert for specific treatment advice."
+        
         # Create a prompt for DeepSeek
         prompt = "You are an expert agricultural consultant. Based on the following crop analysis results, provide brief treatment and care recommendations:\n\n"
         
@@ -514,14 +522,17 @@ async def api_info():
     }
 
 if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    
     print("🌱 Starting Crop Disease Identification API...")
-    print("📖 Documentation: http://localhost:8000/docs")
-    print("🌐 Web Interface: http://localhost:8000")
+    print(f"📖 Documentation: http://0.0.0.0:{port}/docs")
+    print(f"🌐 Web Interface: http://0.0.0.0:{port}")
     
     uvicorn.run(
         "main_fastapi:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True,
+        port=port,
+        reload=False,  # Set to False for production
         log_level="info"
     )
