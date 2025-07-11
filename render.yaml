@@ -2,11 +2,12 @@ services:
   - type: web
     name: crop-disease-api
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      python diagnostic.py
-    startCommand: uvicorn main_fastapi:app --host 0.0.0.0 --port $PORT --workers 1
+    region: oregon
     plan: free
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: uvicorn main_fastapi:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health
     envVars:
       - key: API_KEY
@@ -14,4 +15,4 @@ services:
       - key: DEEPSEEK_API_KEY
         value: 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
       - key: PYTHON_VERSION
-        value: 3.11.9
+        value: 3.12.7

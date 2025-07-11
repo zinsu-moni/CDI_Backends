@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: crop-disease-api-test
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: |
+      pip install --upgrade pip
+      pip install fastapi uvicorn[standard] python-multipart requests
+    startCommand: uvicorn simple_test:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health

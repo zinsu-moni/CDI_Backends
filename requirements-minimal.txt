@@ -1,0 +1,5 @@
+# Minimal requirements for testing deployment
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+python-multipart
+requests
